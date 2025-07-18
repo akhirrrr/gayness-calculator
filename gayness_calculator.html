@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gayness Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff);
+            animation: rainbow 3s ease-in-out infinite;
+        }
+
+        @keyframes rainbow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4, #ff0000, #ff8800);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .start-section {
+            display: block;
+        }
+
+        .loading-section {
+            display: none;
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .start-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+        .start-button:active {
+            transform: translateY(0);
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            min-height: 20px;
+        }
+
+        .progress-container {
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .result-text {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+            animation: colorCycle 1s infinite;
+        }
+
+        @keyframes colorCycle {
+            0% { color: #ff1493; }
+            16% { color: #ff69b4; }
+            33% { color: #ff0000; }
+            50% { color: #ff8800; }
+            66% { color: #ffff00; }
+            83% { color: #00ff00; }
+            100% { color: #0088ff; }
+        }
+
+        .button-group {
+            margin-top: 30px;
+        }
+
+        .share-button, .reset-button {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reset-button {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+        }
+
+        .share-button:hover, .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .emoji {
+            font-size: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .share-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .share-notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .result-text {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculate Your Gayness</h1>
+        
+        <div class="start-section" id="startSection">
+            <button class="start-button" onclick="startCalculation()">
+                <span class="emoji">🌈</span> Start Calculation <span class="emoji">✨</span>
+            </button>
+        </div>
+        
+        <div class="loading-section" id="loadingSection">
+            <div class="loading-text" id="loadingText">Calculating...</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+        
+        <div class="result-section" id="resultSection">
+            <div class="result-text" id="resultText">🌈 100% GAY! 🌈</div>
+            <div class="button-group">
+                <button class="share-button" onclick="shareResult()">
+                    📱 Share Result
+                </button>
+                <button class="reset-button" onclick="resetApp()">
+                    🔄 Calculate Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="share-notification" id="shareNotification">
+        Result copied to clipboard! 🎉
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const calculationSteps = [
+            "Analyzing personality...",
+            "Checking fashion sense...",
+            "Evaluating music taste...",
+            "Processing rainbow energy...",
+            "Calculating final result..."
+        ];
+
+        function startCalculation() {
+            document.getElementById('startSection').style.display = 'none';
+            document.getElementById('loadingSection').style.display = 'block';
+            
+            currentStep = 0;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const loadingText = document.getElementById('loadingText');
+            const progressBar = document.getElementById('progressBar');
+            
+            if (currentStep < calculationSteps.length) {
+                loadingText.textContent = calculationSteps[currentStep];
+                
+                // Animate progress bar
+                const targetWidth = ((currentStep + 1) / calculationSteps.length) * 100;
+                progressBar.style.width = targetWidth + '%';
+                
+                currentStep++;
+                setTimeout(updateProgress, 1000);
+            } else {
+                // Show result after a brief delay
+                setTimeout(showResult, 500);
+            }
+        }
+
+        function showResult() {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // Add some celebration effects
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.pointerEvents = 'none';
+                    confetti.style.zIndex = '9999';
+                    confetti.style.animation = 'fall 3s linear forwards';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 100);
+            }
+        }
+
+        function shareResult() {
+            const resultText = "I just calculated my gayness and got 100% GAY! 🌈✨\n\nTry it yourself: " + window.location.href;
+            
+            // Try to copy to clipboard
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(resultText).then(() => {
+                    showShareNotification();
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(resultText);
+                });
+            } else {
+                fallbackCopyTextToClipboard(resultText);
+            }
+            
+            // Try to share via Web Share API if available
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Gayness Calculator Result',
+                    text: 'I just calculated my gayness and got 100% GAY! 🌈✨',
+                    url: window.location.href
+                }).catch(err => {
+                    console.log('Error sharing:', err);
+                });
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showShareNotification();
+            } catch (err) {
+                console.error('Fallback: Could not copy text: ', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showShareNotification() {
+            const notification = document.getElementById('shareNotification');
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function resetApp() {
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('startSection').style.display = 'block';
+            
+            // Reset progress bar
+            document.getElementById('progressBar').style.width = '0%';
+            currentStep = 0;
+        }
+
+        // Add falling animation for confetti
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                0% {
+                    transform: translateY(-100vh) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
